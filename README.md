@@ -1,6 +1,7 @@
 # vue2018
 
 > A Vue.js project
+一个各种vue项目的集合包。
 
 ## Build Setup
 
@@ -23,5 +24,6 @@ npm run unit
 # run all tests
 npm test
 ```
+### 项目计划
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+1. cnode社区
