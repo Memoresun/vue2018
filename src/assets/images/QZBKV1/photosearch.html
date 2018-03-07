@@ -1,0 +1,175 @@
+{template 'www/_header'}
+<script src="../addons/qzbk_exam/static/js/lib/jquery.min.js"></script>
+<script src="../addons/qzbk_exam/static/js/lib/jquery.Jcrop.js"></script>
+<div class="www-main-page">
+	<div class="www-select-page">
+		<!-- 手动输题 -->
+		<div class="www-input-page">
+			<h3>手动输题:</h3>
+			<form method="post">
+				<textarea type="text" class="search-input">请输入题目</textarea>
+				<input type="hidden" name="op" value="input">
+				<button class="input-search-btn" type="submit">搜题</button>
+				<input type="hidden" name="token" value="{$_W['token']}" />
+			</form>
+		</div>
+
+		<!-- 拍照搜题 -->
+		<div class="www-photo-page">
+			<div class="photo-icon">
+				<img src="../addons/qzbk_exam/static/images/raw_1487153168.png" alt="">
+			</div>
+			<h3>拍照搜题</h3>
+		</div>
+
+		<!-- 弹出框 -->
+		<div id="js_dialog" style="display: none;">
+			<div class="weui-mask"></div>
+			<div class="weui-dialog">
+				<div class="weui-dialog__bd">
+					<span>所属年份:</span>
+					<input type="text" name="year" id="year" class="photo-year">
+				</div>
+				<div class="weui-dialog__ft" style="height: 48px;">
+					<!--<button class="weui-dialog__btn weui-dialog__btn_primary photo-btn">去搜题</button>-->
+					<input class="weui-dialog__btn weui-dialog__btn_primary" type="file" name="image" id="file" accept="image/*" value="搜题">
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="www-preview-page" style="display: none;">
+		<div id="image"></div>
+		<div class="www-op">
+			<button class="js_search">搜题</button>
+			<button class="js_cancel">取消</button>
+		</div>
+	</div>
+
+<script type="text/javascript">
+
+	$(".photo-icon").unbind().bind('click',function () {
+		$("#js_dialog").show();
+		$(".weui-mask").unbind().bind('click',function () {
+			$("#js_dialog").hide();
+		})
+	});
+
+	var wfile = {};
+	var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+    var c = {"x":13,"y":7,"x2":487,"y2":107};
+    var url = "http://dingyue.memorecool.cn/app/index.php?i=2&c=entry&do=upload&m=qzbk_exam";
+
+	function dataURItoBlob(dataURI) {
+	    var byteString = atob(dataURI.split(',')[1]);
+	    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+	    var ab = new ArrayBuffer(byteString.length);
+	    var ia = new Uint8Array(ab);
+	    for (var i = 0; i < byteString.length; i++) {
+	        ia[i] = byteString.charCodeAt(i);
+	    }
+    	return new Blob([ab], {type: mimeString});
+    }
+
+	// 搜题
+	 $(".js_search").bind('click',function(){
+	 	console.log(wfile);
+	 	if(wfile){
+	 		upload(wfile);
+	 	}
+	 });
+
+
+	// 取消
+
+	$("js_cancel").bind('click',function () {
+
+	});
+
+	// 上传
+	function upload(file){
+        var fd = new FormData();
+        fd.append('file', dataURItoBlob(file.dataURL), file.name);
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: fd,
+            processData: false,
+            contentType: false,
+            xhr: function() {
+                var xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = evt.loaded / evt.total;
+                        // 本地 server 速度会很快, 可以在 Chrome 开发者工具限制网速来模拟
+                        console.log('进度', percentComplete);
+                    }
+                }, false);
+
+                return xhr;
+            }
+        }).success(function (res) {
+            console.log(res);
+			var result = JSON.parse(res);
+			if(result.error == 0){
+				location.href = result.url
+			}
+        }).error(function (err) {
+            console.log(err);
+        });
+    }
+
+	$("#file").on('change', function (e) {
+
+		$("#js_dialog").hide();
+		$(".www-select-page").hide();
+		$(".www-preview-page").show();
+
+
+		var year = $("#year").val();
+	    file = e.target.files[0];
+	    if (file && /^image\//i.test(file.type)) {
+	        var reader = new FileReader();
+	        reader.onloadend = function () {
+	            // 图片的 base64 格式, 可以直接当成 img 的 src 属性值
+	            var dataURL = reader.result;
+	            var img = new Image();
+	            img.id = 'js_jcrop';
+	            img.src = dataURL;
+	            // 插入到 DOM 中预览
+	            wfile.name = year + '*' + file.name;
+	            $("#image").append(img);
+
+	            $("#js_jcrop").css({'vertical-align':'middle','width':'100%'});
+	            var w = $("#image").width();
+	            var h = $("#image").height();
+	        
+	      //       $("#js_jcrop").Jcrop({
+	      //       	allowSelect: false,
+	      //       	bgFade: true,
+	      //       	setSelect:[c.x,c.y,c.x2,c.y2],
+	      //       	onSelect:function(obj){
+	      //       		// 裁剪
+	      //       		console.log(img);
+
+	      //       		var nw = parseInt(parseInt(obj.w)/parseInt(w)*parseInt(img.width));
+       //  				var nh = parseInt(parseInt(obj.h)/parseInt(h)*parseInt(img.height)); 
+       //  				var nx = parseInt(parseInt(obj.x)/parseInt(w)*parseInt(img.width)); 
+    			// 		var ny = parseInt(parseInt(obj.y)/parseInt(h)*parseInt(img.height));        
+	      //       		console.log(nw,nh,nx,ny);
+	      //       		console.log(obj);
+	            			canvas.width = img.width;
+	            			canvas.height = img.height;
+	             		ctx.drawImage(img,0,0,img.width,img.height);
+	 					 wfile.dataURL = canvas.toDataURL('image/png');
+	      //       	}
+	      //       });
+	        };
+
+	        // 读出base64格式
+	        reader.readAsDataURL(file);
+	    }
+	});
+</script>
+{template 'www/_footer'}
