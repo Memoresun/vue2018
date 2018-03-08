@@ -9,7 +9,7 @@
     <div class="center-content">
       <div class="weui-cells">
         <a class="weui-cell weui-cell_access" href="#">
-          <div class="weui-cell__hd"> 
+          <div class="weui-cell__hd">
             <img class="www-cell-icon" src="../../assets/images/QZBKV1/c_1.png" alt="">
           </div>
           <div class="weui-cell__bd weui-cell_primary">
@@ -18,7 +18,7 @@
           <span class="weui-cell__ft"></span>
         </a>
         <a class="weui-cell weui-cell_access" href="#">
-          <div class="weui-cell__hd" >
+          <div class="weui-cell__hd">
             <img class="www-cell-icon" src="../../assets/images/QZBKV1/c_2.png" alt="">
           </div>
           <div class="weui-cell__bd weui-cell_primary">
